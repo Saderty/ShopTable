@@ -4,37 +4,52 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Date;
 
 public class ShopTable extends JFrame {
     DefaultTableModel model;
     JTable table;
 
     ShopTable() {
-        setSize(1000, 1000);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
+
         model = new DefaultTableModel();
         table = new JTable(model);
-        JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.setBounds(0, 0, 500, 500);
-        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        table.setBounds(0, 0, 500, 500);
+        JPanel panel = new JPanel();
+        panel.setLayout(null);
+        panel.setBounds(0, 0, 500, 500);
 
         JButton rowButton = new JButton();
         rowButton.setBounds(0, 500, 500, 50);
         rowButton.setText("Добавить строку");
-        add(rowButton);
+        panel.add(rowButton);
         JButton calcButton = new JButton();
         calcButton.setBounds(0, 550, 500, 50);
         calcButton.setText("Рассчитать таблицу");
-        add(calcButton);
+        panel.add(calcButton);
         JButton printButton = new JButton();
         printButton.setBounds(0, 600, 500, 50);
         printButton.setText("Создать таблицу");
-        add(printButton);
+        panel.add(printButton);
 
-        add(scrollPane);
+
+        //panel.setBounds(0, 0, 500, 1000);
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        //panel.setBounds(0,0,500,500);
+        scrollPane.setBounds(0, 0, (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth() - 100, 500);
+        //scrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
+//panel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        panel.add(scrollPane);
+        add(panel);
 
         model.addColumn("Название");//0
         model.addColumn("Кол-во");//1
@@ -68,7 +83,7 @@ public class ShopTable extends JFrame {
         rowButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                model.insertRow(table.getRowCount() - 1, new String[]{"", "", "", ""});
+                model.insertRow(table.getRowCount() - 1, new String[]{""});
             }
         });
 
@@ -82,17 +97,17 @@ public class ShopTable extends JFrame {
                 for (int i = 0; i < table.getRowCount() - 1; i++) {
                     a = Double.parseDouble((String) table.getValueAt(i, 1));
                     b = Double.parseDouble((String) table.getValueAt(i, 2));
-                    p = Double.parseDouble((String) table.getValueAt(i, 3)) / 100;
-                    table.setValueAt(b + b * p, i, 4);
+                    p = Double.parseDouble((String) table.getValueAt(i, 3)) / 100 + 1;
+                    table.setValueAt(b * p, i, 4);
                     table.setValueAt(a * b, i, 5);
                     c += a * b;
-                    table.setValueAt(a * b + a * b * p, i, 6);
+                    table.setValueAt(a * b * p, i, 6);
                 }
                 for (int i = 1; i < table.getColumnCount(); i++) {
                     table.setValueAt("", table.getRowCount() - 1, i);
                 }
                 table.setValueAt(c, table.getRowCount() - 1, 5);
-                table.setValueAt(c + c * p, table.getRowCount() - 1, 6);
+                table.setValueAt(c * p, table.getRowCount() - 1, 6);
             }
         });
 
@@ -125,7 +140,10 @@ public class ShopTable extends JFrame {
                     row.createCell(j).setCellValue(s);
                 }
             }
-            workbook.write(new FileOutputStream("/home/saderty/Table.xlsx"));
+            File file = new File("C:\\Магазин\\Таблица " + new Date().toString() + ".xlsx");
+            file.getParentFile().mkdirs();
+            //workbook.write(new FileOutputStream("/home/saderty/Table " + new Date().toString() + ".xlsx"));
+            workbook.write(new FileOutputStream(file));
         } catch (IOException e) {
             e.printStackTrace();
         }
