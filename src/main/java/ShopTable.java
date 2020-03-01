@@ -7,6 +7,8 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -118,6 +120,25 @@ public class ShopTable extends JFrame {
             }
         });
 
+        table.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent keyEvent) {
+
+            }
+
+            @Override
+            public void keyPressed(KeyEvent keyEvent) {
+            }
+
+            @Override
+            public void keyReleased(KeyEvent keyEvent) {
+                if (keyEvent.getKeyCode() == KeyEvent.VK_DELETE) {
+                    if (table.getSelectedRow()+1 != table.getRowCount())
+                        model.removeRow(table.getSelectedRow() );
+                }
+            }
+        });
+
         setVisible(true);
     }
 
@@ -140,12 +161,13 @@ public class ShopTable extends JFrame {
                     row.createCell(j).setCellValue(s);
                 }
             }
-            File file = new File("C:\\Магазин\\Таблица " + new Date().toString() + ".xlsx");
-            file.getParentFile().mkdirs();
+            String s = "C:\\Магазин\\Таблица " + new Date().toString().replaceAll(":", "_") + ".xlsx";
+            File file = new File(s);
+            new File("C:\\Магазин\\").mkdirs();
             //workbook.write(new FileOutputStream("/home/saderty/Table " + new Date().toString() + ".xlsx"));
             workbook.write(new FileOutputStream(file));
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
     }
 }
